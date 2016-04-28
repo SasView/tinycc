@@ -8,7 +8,7 @@ Installation of the compiler and the python interface is simply::
 
     pip install tinycc
 
-Full documentation for the compiler is available at `<http://belard.org/tcc>`_.
+Full documentation for the compiler is available at `<http://bellard.org/tcc>`_.
 
 *TCC* is the full path to the tcc.exe executable, wrapped in quotes so that
 it can be used as part of an os.system command even when it contains spaces.
