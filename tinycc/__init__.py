@@ -138,7 +138,7 @@ def find_tcc_path():
         return path
 
     # Check next to exe/zip file
-    path = joinpath(realpath(dirname(sys.executable, 'tinycc-data', EXE)))
+    path = joinpath(realpath(dirname(sys.executable)), 'tinycc-data', EXE)
     if exists(path):
         return path
 
