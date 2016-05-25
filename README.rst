@@ -4,11 +4,14 @@ TinyCC compiler bundle
 TinyCC (or tcc) is a small, fast C compiler capable of producing DLLs that can
 be loaded via ctypes.  This version compiles for 64 bit Windows.
 
+Compiler version: 0.9.26 (amd64) 2013-02-16
+
 Installation of the compiler and the python interface is simply::
 
     pip install tinycc
 
 Full documentation for the compiler is available at `<http://bellard.org/tcc>`_.
+Source and binaries are available from `<https://savannah.nongnu.org/projects/tinycc/>`_.
 
 *TCC* is the full path to the tcc.exe executable, wrapped in quotes so that
 it can be used as part of an os.system command even when it contains spaces.
