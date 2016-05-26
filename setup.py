@@ -1,19 +1,34 @@
 import os
-from setuptools import setup,find_packages
+from os.path import join as joinpath
+import sys
+from glob import glob
 
-from tinycc import __version__
+#from setuptools import setup,find_packages
+from distutils.core import setup
 
-packages = find_packages(exclude=['docs', 'tests*'])
-includes = ['include/*.h'] + [
-    os.path.join(path[7:], d, '*.h')
-    for path, dirs, _  in os.walk('tinycc/include')
+# Pull version number out of package init file.
+with open(joinpath('tinycc','__init__.py')) as fid:
+    for line in fid:
+        if line.startswith('__version__'):
+            __version__ = line.split('=')[1].strip()[1:-1]
+
+# Walk the include tree keeping a list of directories to install.
+include_dirs = ['include'] + [
+    joinpath(path[7:], d)
+    for path, dirs, _  in os.walk(joinpath('tinycc','include'))
     for d in dirs
     ]
-package_data = {
-    'tinycc': ['*.exe','*.dll', 'lib/*', 'libtcc/*'] + includes,
-}
-required = []
 
+# Pick the target architecture.
+arch = "amd64" if sys.maxsize>2**32 else "x86"
+
+# Note: tinycc.arch is a fake package used to trick package_data into
+# combining data from different directories.  See the following:
+#
+#    https://stackoverflow.com/questions/37451084/combine-directories-using-distutils
+#
+
+# Put it all together...
 setup(
     name="tinycc",
     version = __version__,
@@ -34,7 +49,11 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development :: Compilers',
     ],
-    packages=packages,
-    package_data=package_data,
-    install_requires = required,
-    )
+    packages=['tinycc', 'tinycc.arch'],
+    package_dir={'tinycc.arch': 'tinycc/%s/arch'%arch},
+    package_data={
+        'tinycc': [joinpath(d, "*.h") for d in include_dirs],
+        'tinycc.arch': ['../*.exe', '../*.dll', '../lib/*', '../libtcc/*']
+    },
+    #install_requires = required,
+)
