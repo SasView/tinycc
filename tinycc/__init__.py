@@ -9,21 +9,26 @@ be loaded via ctypes.
 
 *TCC_VERSION* is the compiler version.
 
-*TCC* is the full path to the tcc.exe executable, wrapped in quotes so that
-it can be used as part of an os.system command even when it contains spaces.
-:func:`find_tcc_path` returns the path without quotes.
+*TCC* is the full path to the tcc.exe executable. Note that the executable
+path may contain spaces so it must be wrapped in quotes when used as part
+of an os.system command.
 
 Usage example::
 
     import os
+    import subprocess
     from tinycc import TCC
 
     source = "hello.c"
-    COMPILE = TCC + " -shared -rdynamic -Wall %(source)s -o %(target)s"
     target = os.path.splitext(source)[0] + ".dll"  # replace .c with .dll
-    command = COMPILE%{"source": source, "target": target}
-    status = os.system(command)
-    if status != 0 or not os.path.exists(target):
+    command = [TCC, "-shared", "-rdynamic", "-Wall", source, "-o", target]
+    try:
+        # need shell=True on windows to keep console box from popping up
+        shell = os.name == "nt"
+        subprocess.check_output(command, shell=shell, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError("compile failed.\n%s\n%s"%(command_str, exc.output))
+    if not os.path.exists(target):
         raise RuntimeError("compile failed.  File is in %r"%source)
 
 or more simply, use :func:`compile`::
@@ -64,15 +69,25 @@ def compile(source, target=None):
     If *target* is not specified, replace the source extension with ".dll"
     and use that as the target. This function does not check that source
     ends with ".c".
+
+    Raises RuntimeError if compile fails.  The exception contains the
+    compiler output.
     """
-    import os
+    import os, logging, subprocess
 
     if target is None:
         target = os.path.splitext(source)[0] + ".dll"
-    COMPILE = TCC + " -shared -rdynamic -Wall %(source)s -o $(target)s"
-    command = COMPILE%{"source": source, "target": target}
-    status = os.system(command)
-    if status != 0 or not os.path.exists(target):
+
+    command = [TCC, "-shared", "-rdynamic", "-Wall", source, "-o", target]
+    command_str = " ".join('"%s"'%p if ' ' in p else p for p in command)
+    logging.info(command_str)
+    try:
+        # need shell=True on windows to keep console box from popping up
+        shell = (os.name == 'nt')
+        subprocess.check_output(command, shell=shell, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError("compile failed.\n%s\n%s"%(command_str, exc.output))
+    if not os.path.exists(target):
         raise RuntimeError("compile failed.  File is in %r"%source)
     return target
 
@@ -145,4 +160,4 @@ def find_tcc_path():
     raise ImportError("Could not locate tcc.exe")
 
 
-TCC = '"%s"' % find_tcc_path()
+TCC = find_tcc_path()

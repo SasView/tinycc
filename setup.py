@@ -10,7 +10,7 @@ from distutils.core import setup
 with open(joinpath('tinycc','__init__.py')) as fid:
     for line in fid:
         if line.startswith('__version__'):
-            __version__ = line.split('=')[1].strip()[1:-1]
+            __version__ = line.split('"')[1]
 
 # Walk the include tree keeping a list of directories to install.
 include_dirs = ['include'] + [
