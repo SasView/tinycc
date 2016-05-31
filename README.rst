@@ -2,7 +2,8 @@ TinyCC compiler bundle
 ======================
 
 TinyCC (or tcc) is a small, fast C compiler capable of producing DLLs that can
-be loaded via ctypes.  This version compiles for 64 bit Windows.
+be loaded via ctypes.  This version includes compilers for 32-bit and
+64-bit Windows.
 
 Compiler version: 0.9.26 (amd64) 2013-02-16
 
@@ -13,28 +14,37 @@ Installation of the compiler and the python interface is simply::
 Full documentation for the compiler is available at `<http://bellard.org/tcc>`_.
 Source and binaries are available from `<https://savannah.nongnu.org/projects/tinycc/>`_.
 
-*TCC* is the full path to the tcc.exe executable, wrapped in quotes so that
-it can be used as part of an os.system command even when it contains spaces.
-The function *find_tcc_path()* returns the path without quotes.
+*TCC* is the full path to the tcc.exe executable. Note that the executable
+path may contain spaces so it must be wrapped in quotes when used as part
+of an os.system command.
+
+*TCC_VERSION* is the compiler version.
 
 Usage example::
 
-    import os
-    from tinycc import TCC
-
-    COMPILE = TCC + " -shared -rdynamic -Wall %(source)s -o %(target)s"
-
-    source = "hello.c"
-    target = os.path.splitext(source)[0] + ".dll"  # replace .c with .dll
-    command = COMPILE%{"source": source, "target": target}
-    status = os.system(command)
-    if status != 0 or not os.path.exists(target):
-        raise RuntimeError("compile failed.  File is in %r"%source)
-
-or more simply, use *compile*::
-
     from tinycc import compile
     dll_path = compile("hello.c")
+
+This creates "hello.dll" in the same directory as "hello.c".  Use
+*compile(source, target)* to control the path to the dll.
+
+For more flexibility, you can call the compiler directly::
+
+    import os
+    import subprocess
+    from tinycc import TCC
+
+    source = "hello.c"
+    dll_path = os.path.splitext(source)[0] + ".dll"  # replace .c with .dll
+    command = [TCC, "-shared", "-rdynamic", "-Wall", source, "-o", dll_path]
+    try:
+        # need shell=True on windows to keep console box from popping up
+        shell = os.name == "nt"
+        subprocess.check_output(command, shell=shell, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError("compile failed.\n%s\n%s"%(command_str, exc.output))
+    if not os.path.exists(dll_path):
+        raise RuntimeError("compile failed.  File is in %r"%source)
 
 Use *data_files* to gather the data files required for bundling tinycc
 in a py2exe package.  This places the compiler in the tinycc-data directory
@@ -52,3 +62,8 @@ the setup.py for the py2exe build::
         data_files = data_files,
         ...
         )
+
+Note: if you have put tcc.exe somewhere unusual (i.e., not in the tinycc
+package and not in tinycc-data next to the py2exe generated library or exe),
+then you can set the environment variable TCC_ROOT to the directory
+containing tcc.exe.
