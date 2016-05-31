@@ -59,7 +59,7 @@ then you can set the environment variable TCC_ROOT to the directory
 containing tcc.exe.
 """
 
-__version__ = "1.0"
+__version__ = "1.0.1"
 TCC_VERSION = "0.9.26"  # compiler version returned by tcc -v
 
 def compile(source, target=None):
