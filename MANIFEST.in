@@ -1,0 +1,6 @@
+include README.rst
+include LICENSE
+include setup.py
+recursive-include tinycc *.a *.def *.dll *.exe *.h *.py
+recursive-include doc *.html *.txt
+recursive-include examples *.c
