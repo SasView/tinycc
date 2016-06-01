@@ -1,16 +1,20 @@
 import os
 from os.path import join as joinpath
 import sys
-from glob import glob
 
-#from setuptools import setup,find_packages
+#from setuptools import setup
 from distutils.core import setup
 
 # Pull version number out of package init file.
+version = ""
 with open(joinpath('tinycc','__init__.py')) as fid:
     for line in fid:
         if line.startswith('__version__'):
-            __version__ = line.split('"')[1]
+            version = line.split('"')[1]
+            break
+if not version:
+    raise RuntimeError("Could not extract version number from package init")
+
 
 # Walk the include tree keeping a list of directories to install.
 include_dirs = ['include'] + [
@@ -31,7 +35,7 @@ arch = "amd64" if sys.maxsize>2**32 else "x86"
 # Put it all together...
 setup(
     name="tinycc",
-    version = __version__,
+    version = version,
     description = "TinyCC compiler bundle for windows",
     long_description=open('README.rst').read(),
     author = "SasView Collaboration",
@@ -39,9 +43,9 @@ setup(
     url = "https://github.com/SasView/tinycc",
     keywords = "ctypes compiler",
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Win32 (MS Windows)',
-        'Intended Audience :: Science/Research',
+        'Intended Audience :: Developer',
         'License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: C',

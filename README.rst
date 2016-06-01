@@ -34,16 +34,14 @@ For more flexibility, you can call the compiler directly::
     import subprocess
     from tinycc import TCC
 
-    source = "hello.c"
-    dll_path = os.path.splitext(source)[0] + ".dll"  # replace .c with .dll
-    command = [TCC, "-shared", "-rdynamic", "-Wall", source, "-o", dll_path]
+    source, target = "hello.c", "hello.dll"
+    command = [TCC, "-shared", "-rdynamic", "-Wall", source, "-o", target]
     try:
         # need shell=True on windows to keep console box from popping up
-        shell = os.name == "nt"
-        subprocess.check_output(command, shell=shell, stderr=subprocess.STDOUT)
+        subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         raise RuntimeError("compile failed.\n%s\n%s"%(command_str, exc.output))
-    if not os.path.exists(dll_path):
+    if not os.path.exists(target):
         raise RuntimeError("compile failed.  File is in %r"%source)
 
 Use *data_files* to gather the data files required for bundling tinycc
