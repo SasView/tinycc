@@ -25,8 +25,9 @@ Usage example::
     from tinycc import compile
     dll_path = compile("hello.c")
 
-This creates "hello.dll" in the same directory as "hello.c".  Use
-*compile(source, target)* to control the path to the dll.
+This creates "hello.dll" in the same directory as "hello.c", raising
+RuntimeError if the compile fails.  The exception contains the compiler
+output.  Use *compile(source, target)* to control the path to the dll.
 
 For more flexibility, you can call the compiler directly::
 
