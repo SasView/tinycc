@@ -6,7 +6,7 @@ tinycc (or tcc) is a small, fast C compiler capable of producing DLLs that can
 be loaded via ctypes. See `https://pypi.python.org/pypi/tinycc`_ for details.
 """
 
-__version__ = "1.0.3a"
+__version__ = "1.0.3"
 TCC_VERSION = "0.9.26"  # compiler version returned by tcc -v
 
 def compile(source, target=None):
