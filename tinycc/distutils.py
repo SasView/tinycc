@@ -2,6 +2,15 @@
 
 Provides the TinyCCompiler class, a subclass of UnixCCompiler that
 handles the TinyCC compiler in Windows.
+
+Usage:
+
+    # add the following to setup.py
+    import tinycc.distutils
+    tinycc.distutiols.add_compiler()
+
+    # then you can do the following:
+    $ python setup.py build_ext --compiler=tinycc
 """
 
 import os
