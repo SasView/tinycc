@@ -6,8 +6,11 @@ handles the TinyCC compiler in Windows.
 Usage:
 
     # add the following to setup.py
-    import tinycc.distutils
-    tinycc.distutiols.add_compiler()
+    try:
+        import tinycc.distutils
+        tinycc.distutiols.add_compiler()
+    except ImportError:
+        pass  # platform doesn't have tinycc available
 
     # then you can do the following:
     $ python setup.py build_ext --compiler=tinycc
