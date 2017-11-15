@@ -1,20 +1,25 @@
 """tinycc compiler for distutils
 
 Provides the TinyCCompiler class, a subclass of UnixCCompiler that
-handles the TinyCC compiler in Windows.
+handles the TinyCC compiler in Windows.  By importing this model,
+the list of compilers is extended to include "tinycc".
 
 Usage:
 
     # add the following to setup.py
     try:
         import tinycc.distutils
-        tinycc.distutiols.add_compiler()
     except ImportError:
         pass  # platform doesn't have tinycc available
 
     # then you can do the following:
     $ python setup.py build_ext --compiler=tinycc
+
+If you want to make tinycc available for all packages then you will
+need to import tinycc.distutils as part of your site.py, or maybe
+using .pth magic.
 """
+from __future__ import absolute_import
 
 import os
 import sys
@@ -55,11 +60,6 @@ def get_msvcr():
         else:
             raise ValueError("Unknown MS Compiler version %s " % msc_ver)
 
-def add_compiler():
-    distutils.ccompiler.TinyCCompiler = TinyCCompiler
-    distutils.ccompiler.compiler_class['tinycc'] \
-        = ('ccompiler', 'TinyCCompiler', 'TinyCC C compiler')
-
 class TinyCCompiler(UnixCCompiler):
     """ Handles the TinyCC compiler in Windows.
     """
@@ -94,8 +94,8 @@ class TinyCCompiler(UnixCCompiler):
         self.debug_print(self.compiler_type + ": tcc %s\n" % self.tcc_version)
 
         self.set_executables(
-            compiler=[tinycc.TCC, '-D__TINYCC__', '-Wall'],
-            compiler_so=[tinycc.TCC, '-D__TINYCC__', '-Wall'],
+            compiler=[tinycc.TCC, '-DMS_WIN64', '-D__TINYCC__', '-Wall'],
+            compiler_so=[tinycc.TCC, '-DMS_WIN64', '-D__TINYCC__', '-Wall'],
             compiler_cxx=[],
             linker_exe=[tinycc.TCC],
             linker_so=[tinycc.TCC, '-shared'],
@@ -107,8 +107,6 @@ class TinyCCompiler(UnixCCompiler):
             self.dll_libraries = get_msvcr()
         else:
             self.dll_libraries = []
-
-        sysroot = os.path.dirname(os.path.realpath(sys.executable))
 
     def _compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
         # os x
@@ -128,6 +126,10 @@ class TinyCCompiler(UnixCCompiler):
         # use separate copies, so we can modify the lists
         libraries = copy.copy(libraries or [])
         libraries.extend(self.dll_libraries)
+        if os.name == 'nt':
+            sysroot = os.path.dirname(os.path.realpath(sys.executable))
+            library_dirs = copy.copy(library_dirs or [])
+            library_dirs.append(sysroot)
 
         UnixCCompiler.link(self, target_desc, objects, output_filename,
             output_dir, libraries, library_dirs, runtime_library_dirs,
@@ -272,3 +274,9 @@ def _find_exe_version(cmd):
     # LooseVersion works with strings
     # so we need to decode our bytes
     return LooseVersion(result.group(1).decode())
+
+def add_compiler():
+    distutils.ccompiler.TinyCCompiler = TinyCCompiler
+    distutils.ccompiler.compiler_class['tinycc'] \
+        = ('ccompiler', 'TinyCCompiler', 'TinyCC C compiler')
+add_compiler()
