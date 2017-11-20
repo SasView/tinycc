@@ -96,7 +96,9 @@ Release Notes
 ~~~~~~~~~~~~~
 
 2017-11-20 R 1.1
+
 * support distutils build of python packages
 
 2016-05-31 R 1.0.2
+
 * support build of DLLs for windows 32 and windows 64
