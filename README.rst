@@ -1,9 +1,10 @@
 TinyCC compiler bundle
 ======================
 
-TinyCC (or tcc) is a small, fast C compiler capable of producing DLLs that can
-be loaded via ctypes.  This version includes compilers for 32-bit and
-64-bit Windows.
+TinyCC (or tcc) is a small, fast C compiler capable of compiling python
+extensions that can be loaded as python modules or producing DLLs that
+can be loaded via ctypes.  This version includes compilers for 32-bit and
+64-bit Windows.  MacOS and Linux are not supported in this release.
 
 Compiler version: 0.9.26 2013-02-16
 
@@ -13,6 +14,7 @@ Installation of the compiler and the python interface is simply::
 
 Full documentation for the compiler is available at `<http://bellard.org/tcc>`_.
 Source and binaries are available from `<https://savannah.nongnu.org/projects/tinycc/>`_.
+The tinycc python package is hosted at `<https://github.com/SasView/tinycc>`_.
 
 *TCC* is the full path to the tcc.exe executable. Note that the executable
 path may contain spaces so it must be wrapped in quotes when used as part
@@ -20,7 +22,30 @@ of an os.system command.
 
 *TCC_VERSION* is the compiler version.
 
-Usage example::
+Python extension
+~~~~~~~~~~~~~~~~
+
+Adding tinycc as a compiler option to setup.py::
+
+    import tinycc.distutils
+
+When this is done, then you can build your project with::
+
+    python setup.py build --compiler=tinycc
+
+Note that tinycc does not support C++ so it cannot be used a replacement
+for MS Visual C++ for Python or mingw as generic compiler for python
+installs.
+
+Also note that the compiler does not fully support C99, and some constructs
+which compile (e. g., returning a structure from a function call) may not
+work in properly.  Be sure to test thoroughly before setting tinycc as a
+recommended compiler for your python package.
+
+Shared library
+~~~~~~~~~~~~~~
+
+Building a DLL::
 
     from tinycc import compile
     dll_path = compile("hello.c")
@@ -66,3 +91,14 @@ Note: if you have put tcc.exe somewhere unusual (i.e., not in the tinycc
 package and not in tinycc-data next to the py2exe generated library or exe),
 then you can set the environment variable TCC_ROOT to the directory
 containing tcc.exe.
+
+Release Notes
+~~~~~~~~~~~~~
+
+2017-11-20 R 1.1
+
+* support distutils build of python packages
+
+2016-05-31 R 1.0.2
+
+* support build of DLLs for windows 32 and windows 64
