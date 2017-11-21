@@ -45,7 +45,7 @@ setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Win32 (MS Windows)',
-        'Intended Audience :: Developer',
+        'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: C',
