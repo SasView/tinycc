@@ -41,24 +41,29 @@ def get_msvcr():
     """
     msc_pos = sys.version.find('MSC v.')
     if msc_pos != -1:
-        msc_ver = sys.version[msc_pos+6:msc_pos+10]
-        if msc_ver == '1300':
+        msc_ver_str = sys.version[msc_pos+6:msc_pos+10]
+        try:
+            msc_ver = int(msc_ver_str)
+        except ValueError:
+            raise ValueError("Failed to parse MS compiler version: %s" % msc_ver_str)
+        if msc_ver == 1300:
             # MSVC 7.0
             return ['msvcr70']
-        elif msc_ver == '1310':
+        elif msc_ver == 1310:
             # MSVC 7.1
             return ['msvcr71']
-        elif msc_ver == '1400':
+        elif msc_ver == 1400:
             # VS2005 / MSVC 8.0
             return ['msvcr80']
-        elif msc_ver == '1500':
+        elif msc_ver == 1500:
             # VS2008 / MSVC 9.0
             return ['msvcr90']
-        elif msc_ver == '1600':
+        elif msc_ver == 1600:
             # VS2010 / MSVC 10.0
             return ['msvcr100']
-        elif msc_ver == '1900':
+        elif (msc_ver == 1900) or (1910 <= msc_ver <= 1914):
             # VS2015 / MSVC 14.0
+            # VS2017 / MSVC 14.1 - 14.14
             # Universal CRT - see:
             # https://blogs.msdn.microsoft.com/vcblog/2015/03/03/introducing-the-universal-crt/
             return ['ucrtbase']
