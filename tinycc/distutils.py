@@ -61,9 +61,9 @@ def get_msvcr():
     elif msc_ver == 1600:
         # VS2010 / MSVC 10.0
         return ['msvcr100']
-    elif (msc_ver == 1900) or (1910 <= msc_ver <= 1914):
+    elif msc_ver >= 1900:
         # VS2015 / MSVC 14.0
-        # VS2017 / MSVC 14.1 - 14.14
+        # ... and later versions
         # Universal CRT - see:
         # https://blogs.msdn.microsoft.com/vcblog/2015/03/03/introducing-the-universal-crt/
         return ['ucrtbase']
